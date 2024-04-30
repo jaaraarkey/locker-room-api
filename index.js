@@ -2,7 +2,7 @@ import express from "express";
 import pg from "pg";
 import bcrypt from "bcrypt";
 import JWT from "jsonwebtoken";
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
 import cors from "cors";
 import pool from "./db.js";
 
@@ -25,9 +25,9 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/test", async (req, res) => {
-  // const q = await pool.query("SELECT * from users");
-  // console.log(pool.query);
-  // res.send(q);
+  const q = await pool.query("SELECT * from users");
+  console.log(pool.query);
+  res.send(q);
 });
 
 app.post("/api/auth/register", async (req, res) => {
@@ -67,6 +67,7 @@ app.post("/api/auth/login", async (req, res) => {
     }
 
     const result = q.rows[0];
+    console.log(result);
     const match = await bcrypt.compare(password, result.password);
 
     if (!match) {
@@ -81,7 +82,7 @@ app.post("/api/auth/login", async (req, res) => {
           expiresIn: "1h",
         }
       );
-
+      console.log(token);
       return res.send({ token });
     } catch (err) {
       console.log(err);
@@ -129,6 +130,15 @@ app.post("/api/messages/new", async (req, res) => {
   );
 });
 
+app.get("/api/messages", async (req, res) => {
+  const messages = await pool.query("SELECT * FROM messages");
+  res.send(messages.rows);
+});
+
+app.listen(process.env.PORT, () => {
+  console.log(`Example app listening on port ${process.env.PORT}`);
+});
+
 // psql --host=cfs632mn9c82a7.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com --port=5432 --username=u8dot7dncu8cg1 --password --dbname=d3kesgd7g95at6
 
 // ? CREATING table users
@@ -157,12 +167,3 @@ CREATE TABLE messages (
 
 // ? To see the constrains ->
 // \d+ -table name-
-
-app.get("/api/messages", async (req, res) => {
-  const messages = await pool.query("SELECT * FROM messages");
-  res.send(messages.rows);
-});
-
-app.listen(process.env.PORT, () => {
-  console.log(`Example app listening on port ${process.env.PORT}`);
-});
