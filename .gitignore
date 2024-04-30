@@ -1,0 +1,5 @@
+lokerroom-backend-exemple/
+lokerroom-frontend-exemple/
+.env
+node_modules/
+index.md
